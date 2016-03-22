@@ -24,6 +24,7 @@ var NestedSortables = new Class({
 		ghostClass: 'ghost',
 		ghostOffset: { x: 20, y: 10 },
 		childStep: 30, // attempts to become a child if the mouse is moved this number of pixels right
+		enableLeafAppend : false,
 		handleClass: null, 
 		onStart: Class.empty,
 		onComplete: Class.empty,
@@ -113,7 +114,7 @@ var NestedSortables = new Class({
 			document.id(document.body).addEvent('drag', this.bound.stop).addEvent('selectstart', this.bound.stop);
 		}
 		
-		this.fireEvent('start', el);
+		this.fireEvent('onStart', el);
 		
 		event.stop();
 		
@@ -181,7 +182,7 @@ var NestedSortables = new Class({
 	},
 	
 	detach: function(){
-		this.list.removeEvent('mousedown', this.start.bind(this));
+		this.list.removeEvent('mousedown', this.bound.start);
 		if (this.options.collapse){
 			this.list.removeEvent('click', this.bound.collapse);
 		}
@@ -197,7 +198,7 @@ var NestedSortables = new Class({
 		
 		document.removeEvent('mouseup', this.bound.end);
 		
-		this.fireEvent('complete', el);
+		this.fireEvent('onComplete', el);
 		
 		if (Browser.ie){
 			document.id(document.body)
@@ -294,7 +295,7 @@ var NestedSortables = new Class({
 				dest = check.getLast();
 				check = dest.getElement(this.options.parentTag);
 			}
-			if (!check && event.page.x > dest.getCoordinates().left+this.options.childStep){
+			if (this.options.enableLeafAppend && !check && event.page.x > dest.getCoordinates().left+this.options.childStep){
 				move = 'inside';
 			}
 		}
